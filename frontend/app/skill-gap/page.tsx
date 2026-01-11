@@ -213,39 +213,34 @@ function SkillGapAnalysisContent() {
       </header>
 
       <main className="container">
-        <Link href="/" className="back-link">
-          ← Back to Dashboard
-        </Link>
+        <Link href="/" className="back-link">← Back to Dashboard</Link>
 
         <div className="card">
-          <h2
-            style={{
-              marginBottom: '0.5rem',
-              color: '#1f2937',
-              fontSize: '1.875rem',
-              fontWeight: 700,
-            }}
-          >
+          <h2 style={{ marginBottom: '0.5rem', color: '#1f2937', fontSize: '1.875rem', fontWeight: 700 }}>
             Skill Gap Analysis
           </h2>
 
-          <p
-            style={{
-              color: '#6b7280',
-              marginBottom: '1.5rem',
-              fontSize: '0.95rem',
-            }}
-          >
-            Identify skill gaps in your resume and get recommendations for
-            career advancement
+          <p style={{ color: '#6b7280', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
+            Identify skill gaps in your resume and get recommendations for career advancement
           </p>
+
+          {!resumeId && (
+            <div className="error">
+              No resume selected. Please go to the <Link href="/resumes" style={{ color: '#c33', textDecoration: 'underline' }}>Resume List</Link> page.
+            </div>
+          )}
 
           {error && <div className="error">{error}</div>}
 
           {resumeId && !analysis && !loading && (
-            <button className="btn" onClick={handleAnalyze}>
-              Analyze Skill Gaps
-            </button>
+            <div>
+              <p style={{ marginBottom: '1.5rem', color: '#666' }}>
+                Click the button below to analyze skill gaps in your resume using AI.
+              </p>
+              <button className="btn" onClick={handleAnalyze}>
+                Analyze Skill Gaps
+              </button>
+            </div>
           )}
 
           {loading && (
@@ -256,55 +251,66 @@ function SkillGapAnalysisContent() {
 
           {analysis && (
             <div>
-              <h3 style={{ marginBottom: '1rem' }}>Analysis Results</h3>
+              <h3 style={{ marginBottom: '1rem', color: 'var(--heading-color)' }}>
+                Skill Gap Analysis Results
+              </h3>
 
-              <ReactMarkdown
-                components={{
-                  li: ({ node, ...props }) => {
-                    // 🔑 Explicitly loosen typing for markdown AST
-                    const astNode = node as any
+              {/* ✅ SAME WRAPPER AS CAREER PAGE */}
+              <div className="analysis-content">
+                <ReactMarkdown
+                  components={{
+                    li: ({ node, ...props }) => {
+                      const astNode = node as any
 
-                    if (!astNode || !astNode.parent) {
+                      if (!astNode || !astNode.parent) {
+                        return <li {...props} />
+                      }
+
+                      const parent = astNode.parent
+
+                      if (
+                        parent.tagName === 'ul' &&
+                        parent.children &&
+                        parent.children[0]?.children &&
+                        parent.children[0]?.children[0]?.value?.includes('Suggested Actions')
+                      ) {
+                        return <ActionItem>{props.children}</ActionItem>
+                      }
+
                       return <li {...props} />
-                    }
-
-                    const parent = astNode.parent
-
-                    if (
-                      parent.tagName === 'ul' &&
-                      parent.children &&
-                      parent.children[0]?.children &&
-                      parent.children[0]?.children[0]?.value?.includes(
-                        'Suggested Actions'
-                      )
-                    ) {
-                      return (
-                        <ActionItem>{props.children}</ActionItem>
-                      )
-                    }
-
-                    return <li {...props} />
-                  },
-                }}
-              >
-                {analysis}
-              </ReactMarkdown>
-
-              <div className="flex flex-wrap gap-4 mt-8">
-                <Link
-                  href={`/career?resume_id=${resumeId}`}
-                  className="btn btn-secondary"
+                    },
+                  }}
                 >
+                  {analysis}
+                </ReactMarkdown>
+              </div>
+
+              {/* ✅ SAME CTA PATTERN AS CAREER PAGE */}
+              <div className="flex flex-wrap gap-4 mt-8">
+                <Link href={`/career?resume_id=${resumeId}`} className="btn btn-secondary">
                   View Career Recommendations
                 </Link>
 
-                <Link
-                  href={`/roadmap?resume_id=${resumeId}`}
-                  className="btn btn-secondary"
-                >
+                <Link href={`/roadmap?resume_id=${resumeId}`} className="btn btn-secondary">
                   Generate Learning Roadmap
                 </Link>
+
+                <button
+                  onClick={handleAnalyze}
+                  className="btn"
+                  disabled={loading}
+                >
+                  {loading ? 'Re-running...' : 'Re-run Skill Gap Analysis'}
+                </button>
               </div>
+
+              <button
+                className="btn"
+                onClick={handleAnalyze}
+                style={{ marginTop: '1.5rem' }}
+              >
+                Generate New Analysis
+              </button>
             </div>
           )}
         </div>
@@ -320,3 +326,4 @@ export default function SkillGapAnalysis() {
     </Suspense>
   )
 }
+
