@@ -439,6 +439,7 @@ import PyPDF2
 import docx
 import io
 import pathlib
+import os
 
 from services.supabase_client import get_supabase_client
 from services.gemini_client import GeminiClient
