@@ -4,4 +4,4 @@ python-dotenv
 supabase
 PyPDF2
 python-docx
-pydantic<2
+google-generativeai
