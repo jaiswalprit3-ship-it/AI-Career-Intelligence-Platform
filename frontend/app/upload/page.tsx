@@ -376,8 +376,13 @@ export default function UploadResume() {
       <main className="container">
         <Link href="/" className="back-link">← Back to Dashboard</Link>
 
-        <div className="card">
-          <h2>Upload Resume</h2>
+        <div className="card" style={{ maxWidth: 820, margin: '0 auto' }}>
+          <h2 style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>
+            Upload Resume
+          </h2>
+          <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
+            Upload your resume as a file or paste the text below for analysis.
+          </p>
 
           {error && <div className="error">{error}</div>}
           {success && <div className="success">{success}</div>}
@@ -393,12 +398,21 @@ export default function UploadResume() {
               onDragLeave={() => setIsDragging(false)}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
+              style={{
+                padding: '2.5rem',
+                borderRadius: 12,
+                textAlign: 'center',
+                fontSize: '1rem',
+                cursor: 'pointer',
+                marginBottom: '1.5rem',
+              }}
             >
-              <p>
+              <p style={{ fontWeight: 500 }}>
                 {selectedFile
                   ? selectedFile.name
                   : 'Click or drag & drop resume (PDF, DOCX, TXT)'}
               </p>
+
               <input
                 ref={fileInputRef}
                 type="file"
@@ -411,15 +425,42 @@ export default function UploadResume() {
             </div>
 
             {/* TEXT AREA */}
-            <textarea
-              placeholder="Or paste resume text here"
-              value={resumeText}
-              onChange={e => setResumeText(e.target.value)}
-              style={{ minHeight: 200, marginTop: '1rem' }}
-            />
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label
+                style={{
+                  display: 'block',
+                  fontWeight: 600,
+                  marginBottom: '0.5rem',
+                }}
+              >
+                Or paste resume text
+              </label>
+              <textarea
+                placeholder="Paste your full resume text here..."
+                value={resumeText}
+                onChange={e => setResumeText(e.target.value)}
+                style={{
+                  width: '100%',
+                  minHeight: 220,
+                  padding: '1rem',
+                  fontSize: '1rem',
+                  lineHeight: 1.6,
+                  borderRadius: 10,
+                  border: '1px solid #d1d5db',
+                }}
+              />
+            </div>
 
-            <button className="btn" disabled={loading} style={{ marginTop: '1rem' }}>
-              {loading ? 'Uploading...' : 'Upload Resume'}
+            <button
+              className="btn"
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '0.9rem',
+                fontSize: '1rem',
+              }}
+            >
+              {loading ? 'Uploading…' : 'Upload Resume'}
             </button>
           </form>
         </div>

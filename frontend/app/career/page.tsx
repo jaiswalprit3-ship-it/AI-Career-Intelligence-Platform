@@ -5,19 +5,20 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
 
 function CareerRecommendationsContent() {
   const searchParams = useSearchParams()
   const resumeId = searchParams.get('resume_id')
-  
+
   const [recommendations, setRecommendations] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
   const handleAnalyze = async () => {
     if (!resumeId) {
-      setError('Please select a resume from the Resume List page')
+      setError('Please select a resume first.')
       return
     }
 
@@ -26,19 +27,22 @@ function CareerRecommendationsContent() {
     setRecommendations('')
 
     try {
-      const response = await fetch(`${BACKEND_URL}/analyze/career/${resumeId}`, {
-        method: 'POST',
-      })
+      const response = await fetch(
+        `${BACKEND_URL}/analyze/career/${resumeId}`,
+        { method: 'POST' }
+      )
 
       if (!response.ok) {
         const data = await response.json()
-        throw new Error(data.detail || 'Failed to generate career recommendations')
+        throw new Error(
+          data.detail || 'Failed to generate career recommendations'
+        )
       }
 
       const data = await response.json()
       setRecommendations(data.recommendations)
     } catch (err: any) {
-      setError(err.message || 'An error occurred while generating career recommendations')
+      setError(err.message || 'Something went wrong')
     } finally {
       setLoading(false)
     }
@@ -58,67 +62,95 @@ function CareerRecommendationsContent() {
       </header>
 
       <main className="container">
-        <Link href="/" className="back-link">← Back to Dashboard</Link>
+        <Link href="/" className="back-link">
+          ← Back to Dashboard
+        </Link>
 
-        <div className="card">
-          <h2 style={{ marginBottom: '0.5rem', color: '#1f2937', fontSize: '1.875rem', fontWeight: 700 }}>
+        <div
+          className="card"
+          style={{ maxWidth: 900, margin: '0 auto' }}
+        >
+          <h2 style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>
             Career Recommendations
           </h2>
-          <p style={{ color: '#6b7280', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
-            Get personalized career path recommendations based on your resume
+
+          <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
+            Explore career paths that best match your skills and experience.
           </p>
-          
+
           {!resumeId && (
             <div className="error">
-              No resume selected. Please go to the <Link href="/resumes" style={{ color: '#c33', textDecoration: 'underline' }}>Resume List</Link> page to select a resume.
+              No resume selected. Go to{' '}
+              <Link href="/resumes" style={{ textDecoration: 'underline' }}>
+                Resume List
+              </Link>
+              .
             </div>
           )}
 
           {error && <div className="error">{error}</div>}
 
+          {/* CTA */}
           {resumeId && !recommendations && !loading && (
-            <div>
-              <p style={{ marginBottom: '1.5rem', color: '#666' }}>
-                Click the button below to get personalized career recommendations based on your resume.
-              </p>
+            <div style={{ textAlign: 'center', marginTop: '2rem' }}>
               <button className="btn" onClick={handleAnalyze}>
                 Get Career Recommendations
               </button>
             </div>
           )}
 
-          {loading && <div className="loading">Generating career recommendations... This may take a moment.</div>}
+          {loading && (
+            <div className="loading" style={{ marginTop: '2rem' }}>
+              Generating career recommendations… please wait.
+            </div>
+          )}
 
+          {/* OUTPUT */}
           {recommendations && (
-            <div>
-              <h3 style={{ marginBottom: '1rem', color: 'var(--heading-color)' }}>Your Career Recommendations</h3>
-              <div className="analysis-content">
+            <div style={{ marginTop: '2.5rem' }}>
+              <div
+                className="analysis-content"
+                style={{
+                  background: '#f9fafb',
+                  padding: '2rem',
+                  borderRadius: 14,
+                  border: '1px solid #e5e7eb',
+                }}
+              >
                 <ReactMarkdown>{recommendations}</ReactMarkdown>
               </div>
-              {resumeId && (
-                <div className="flex flex-wrap gap-4 mt-8">
-                  <Link href={`/skill-gap?resume_id=${resumeId}`} className="btn btn-secondary">
-                    View Skill Gap Analysis
-                  </Link>
-                  <Link href={`/roadmap?resume_id=${resumeId}`} className="btn btn-secondary">
-                    Generate Learning Roadmap
-                  </Link>
-                  <button 
-                    onClick={() => handleAnalyze()} 
-                    className="btn"
-                    disabled={loading}
-                  >
-                    {loading ? 'Re-running...' : 'Re-run Career Recommendations'}
-                  </button>
-                </div>
-              )}
-              <button
-                className="btn"
-                onClick={handleAnalyze}
-                style={{ marginTop: '1.5rem' }}
+
+              {/* ACTIONS */}
+              <div
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '1rem',
+                  marginTop: '2rem',
+                }}
               >
-                Generate New Recommendations
-              </button>
+                <Link
+                  href={`/skill-gap?resume_id=${resumeId}`}
+                  className="btn btn-secondary"
+                >
+                  Skill Gap Analysis
+                </Link>
+
+                <Link
+                  href={`/roadmap?resume_id=${resumeId}`}
+                  className="btn btn-secondary"
+                >
+                  Learning Roadmap
+                </Link>
+
+                <button
+                  onClick={handleAnalyze}
+                  className="btn"
+                  disabled={loading}
+                >
+                  {loading ? 'Re-running…' : 'Re-run Recommendations'}
+                </button>
+              </div>
             </div>
           )}
         </div>
